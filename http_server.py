@@ -64,8 +64,8 @@ while True:
                                     params = params_path.split("&")
                                     params_dict = {}
                                     for param_string in params:
-                                        parts = param_string.split("=")
-                                        params_dict[parts[0]] = parts[1]
+                                        key, value = param_string.split("=")
+                                        params_dict[key] = value
 
                                 response = "{}{}"
                                 response_headers = "HTTP/1.0 {}{}\r\n"
@@ -86,7 +86,6 @@ while True:
                                             response_body = "File Uploaded."
                                         else:
                                             status_code = "404 Not Found\r\n"
-
                                     elif parts[0] == "GET":
                                         if url_path == "/":
                                             status_code = "301 Moved Permanently\r\n"
@@ -101,6 +100,16 @@ while True:
                                             status_code = "200 OK\r\n"
                                             num = params_dict.get("num", "0")
                                             response_body = str(int(num) + 1)
+                                        elif url_path == "/image":
+                                            status_code = "200 OK\r\n"
+                                            ext = "jpg"
+                                            file_name = "{}.{}".format(params_dict.get("image-name", ""), ext)
+                                            file_path = os.path.join(IMAGES_PATH, file_name)
+                                            if os.path.isfile(file_path):
+                                                with open(file_path, "rb") as f:
+                                                    response_body = f.read()
+                                            else:
+                                                status_code = "404 Not Found\r\n"
                                         elif os.path.isfile(abs_path):
                                             if file_directory != "webroot":
                                                 status_code = "403 Forbidden\r\n"
